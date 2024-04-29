@@ -7,6 +7,8 @@ package io.brokerqe.claire.clients.bundled;
 import io.brokerqe.claire.ArtemisConstants;
 import io.brokerqe.claire.Constants;
 import io.brokerqe.claire.clients.DeployableClient;
+import io.brokerqe.claire.clients.MessagingClient;
+import io.brokerqe.claire.executor.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class BundledArtemisClient {
+public class BundledArtemisClient implements MessagingClient {
 
     private final Map<String, String> commandOptions;
     private ArtemisCommand artemisCommand;
@@ -25,6 +27,7 @@ public class BundledArtemisClient {
     private String username;
     private String password;
     private String destination;
+    private Executor subscriberExecutor;
 
     public BundledArtemisClient(DeployableClient deployableClient, ArtemisCommand artemisCommand, Map<String, String> commandOptions) {
         this(deployableClient, artemisCommand, ArtemisConstants.ADMIN_NAME, ArtemisConstants.ADMIN_PASS, commandOptions);
@@ -70,6 +73,12 @@ public class BundledArtemisClient {
         return commandBuild.toString().split(" ");
     }
 
+    public void executeCommandInBackground() {
+        subscriberExecutor = deployableClient.getExecutor();
+        String[] command = constructClientCommand();
+        subscriberExecutor.execBackgroundCommand(command);
+    }
+
     public Object executeCommand() {
         return executeCommand(Constants.DURATION_3_MINUTES);
     }
@@ -78,7 +87,8 @@ public class BundledArtemisClient {
         String cmdOutput;
         String[] command = constructClientCommand();
         cmdOutput = (String) deployableClient.getExecutor().executeCommand(maxTimeout, command);
-        if (artemisCommand.equals(ArtemisCommand.PERF_CLIENT)) {
+        if (artemisCommand.equals(ArtemisCommand.PERF_CLIENT) || artemisCommand.equals(ArtemisCommand.PERF_PRODUCER)
+                || artemisCommand.equals(ArtemisCommand.PERF_CONSUMER)) {
             LOGGER.debug("[PERF] Client detected, to see it's output use trace logging.");
             LOGGER.trace(cmdOutput);
         } else {
@@ -166,4 +176,43 @@ public class BundledArtemisClient {
         return data;
     }
 
+    @Override
+    public int sendMessages() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public int receiveMessages() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public void subscribe() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public void unsubscribe() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public Object getSentMessages() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public Object getReceivedMessages() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public boolean compareMessages() {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
+
+    @Override
+    public boolean compareMessages(Object sentMessages, Object receivedMessages) {
+        throw new UnsupportedOperationException("[" + deployableClient.getContainerName() + "] not implemented yet");
+    }
 }

@@ -941,4 +941,10 @@ public class KubeClient {
         assertThat(copyResult, is(Boolean.TRUE));
         return Path.of(dstDir + Constants.FILE_SEPARATOR + srcDir);
     }
+
+    public Path copyPodFile(Pod artemisPod, String srcFile, Path dstFile) {
+        boolean copyResult = client.pods().resource(artemisPod).file(srcFile).copy(dstFile);
+        assertThat(copyResult, is(Boolean.TRUE));
+        return dstFile;
+    }
 }
