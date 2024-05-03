@@ -18,7 +18,11 @@ import io.brokerqe.claire.clients.bundled.BundledArtemisClient;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +35,6 @@ public class PerformanceTests extends AbstractSystemTests {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PerformanceTests.class);
     private final String testNamespace = getRandomNamespaceName("perf-tests", 3);
-    private String testName;
     private String testNameDir;
 
     @BeforeAll
@@ -47,7 +50,7 @@ public class PerformanceTests extends AbstractSystemTests {
     @BeforeEach
     void init(TestInfo testInfo) {
         this.testInfo = testInfo;
-        testName = testInfo.getTestMethod().orElseThrow().getName().toLowerCase(Locale.ROOT);
+        String testName = testInfo.getTestMethod().orElseThrow().getName().toLowerCase(Locale.ROOT);
         testNameDir = Constants.PERFORMANCE_DIR + "/" + "operator" + "/" + testName;
         TestUtils.createDirectory(testNameDir);
     }
@@ -108,9 +111,9 @@ public class PerformanceTests extends AbstractSystemTests {
 
     private void getPerfResults(Pod pod) {
         getClient().copyPodFile(pod, "producer.hdr", Path.of(testNameDir + Constants.FILE_SEPARATOR + "producer.hdr"));
-        getClient().copyPodFile(pod,"producer.json", Path.of( testNameDir + Constants.FILE_SEPARATOR + "producer.json"));
+        getClient().copyPodFile(pod, "producer.json", Path.of(testNameDir + Constants.FILE_SEPARATOR + "producer.json"));
         getClient().copyPodFile(pod, "consumer.hdr", Path.of(testNameDir + Constants.FILE_SEPARATOR + "consumer.hdr"));
-        getClient().copyPodFile(pod,"consumer.json", Path.of(testNameDir + Constants.FILE_SEPARATOR + "consumer.json"));
+        getClient().copyPodFile(pod, "consumer.json", Path.of(testNameDir + Constants.FILE_SEPARATOR + "consumer.json"));
     }
 
     @Test
